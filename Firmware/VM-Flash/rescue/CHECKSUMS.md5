@@ -6,6 +6,7 @@ d927dee4ba5a9bfdd576ebd7bca204c8  avr-objcopy.exe
 4c3ec78c5bc604e16a15c13efdbdd5e2  Createbin.exe
 d2002444f1502d13b3785f606ef7c70d  dfu-programmer.exe
 f67ca8d338dfd99e3c540336221f8fa7  msvcr120d.dll
-9d689f78b9ab404be205af583cfbb457  flash_auto.bat
 77e2d4ed6db55f35d9d2e67ab7b8f596  flash.bat
-3903db198fa5c680729303873f1d5d9d  paso2_solo_app.bat
+18db6151ad7d2ba5046c759ff2ba724b  flash_auto.bat
+453bff55fdae97b0268565070018f6bd  step2_app_only.bat
+9ff3c898b1fc8fe166561d449e8d212d  README.txt
