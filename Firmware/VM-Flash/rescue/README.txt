@@ -77,7 +77,7 @@ VirtualBox so it re-attaches after each reset.
 
 If it keeps stopping at the same point across cycles:
 
-     step2_app_only.bat      <- writes the application with dfu-programmer
+     flash_app_only.bat      <- writes the application with dfu-programmer
      flash.bat               <- then repeat the official procedure
 
 
@@ -95,7 +95,7 @@ Check with VERSIONMY? -> it should answer "Chameleon-new-1.0".
 WHAT NOT TO DO
 --------------
 - Do not use dfu-programmer on your own to "fix it": its writes leave the board
-  unable to boot. Only step2_app_only.bat as documented above.
+  unable to boot. Only flash_app_only.bat as documented above.
 - Do not flash ChameleonMini.eep as if it were an application: its content goes
   to 0x8000, which is the bootloader region.
 - From Linux you CANNOT flash this board. All writes fail with
@@ -115,6 +115,6 @@ avr-objcopy.exe         ihex -> binary
 msvcr120d.dll           runtime needed by Createbin.exe
 dfu-programmer.exe      only for step 2
 app_stock.hex           factory firmware for step 2
-step2_app_only.bat      step 2
+flash_app_only.bat      step 2
 driver\                 DFU libusb-win32 driver (.inf + .sys)
 CHECKSUMS.md5           integrity
