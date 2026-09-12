@@ -1,0 +1,149 @@
+================================================================================
+KIT DE RECUPERACION - ChameleonMini RevE rebooted (clon, ATxmega32A4U)
+Restaura el firmware de fabrica "Chameleon-new-1.0"
+Procedimiento verificado el 2026-09-11
+================================================================================
+
+CUANDO USAR ESTO
+----------------
+- La placa solo enumera como 03eb:2fe4 (ATxmega32A4U DFU bootloader)
+- No enciende el LED / no aparece como puerto serie
+- Entra en DFU con y sin pulsar el boton negro
+- El flasheo dice "no device present" o "Bootloader and code overlap"
+
+TUS DATOS NO SE PIERDEN. La memoria de tarjetas de los 8 slots vive en otra
+region: sobrevive a borrados de flash y a la reescritura de EEPROM. Verificado
+por md5 antes y despues de un borrado completo.
+
+
+REQUISITOS (en la VM Windows)
+-----------------------------
+1. Visual C++ 2013 Redistributable. En Windows de 64 bits hace falta el x86.
+2. Driver DFU instalado: Administrador de dispositivos > dispositivo desconocido
+   > Actualizar controlador > carpeta driver\
+   Debe quedar como "Atmel USB Devices > ATxmega32A4U".
+   Si Windows rechaza el .inf por firma, usar Zadig (zadig.akeo.ie) y asignar
+   libusb-win32 al dispositivo 03EB:2FE4.
+3. Passthrough USB a la VM: Dispositivos > USB > ATxmega32A4U DFU bootloader.
+
+NUNCA pongas un libusb0.dll en esta carpeta. El ejecutable la cargaria antes que
+la del sistema y la enumeracion falla con "no device present". Esta ausente a
+proposito.
+
+
+PROCEDIMIENTO
+-------------
+1. Desconecta el USB. Manten pulsado el boton negro y conectalo.
+2. Passthrough a la VM.
+3. cmd COMO ADMINISTRADOR:
+
+     cd C:\vm-rescue
+     flash.bat
+
+4. Lee la salida. Tiene que aparecer TODO esto:
+
+     Programming 0x400 bytes...   Success     <- EEPROM
+     Reading 0x400 bytes...
+     Programming 0x5900 bytes...  Success     <- APLICACION
+     Reading 0x7000 bytes...
+     load_success!                            <- confirmacion real
+
+   El "Enjoy!" del final lo imprime el .bat SIEMPRE, salga bien o mal.
+   NO significa nada. La unica linea que cuenta es load_success!
+
+5. Desconecta y reconecta normal. Debe encender LED y aparecer como
+   03eb:2044 / puerto COM (en Linux: /dev/ttyACM0).
+
+
+SI LA SALIDA SE CORTA ANTES DE "load_success!"   <-- PASA A MENUDO, ES NORMAL
+-----------------------------------------------------------------------------
+El bootloader entra en estado dfuERROR (10) y a partir de ahi stallea todo.
+BOOT_LOADER_EXE.exe no lo reporta: deja de trabajar en silencio y devuelve
+el control al .bat.
+
+SOLUCION: ciclo de alimentacion. Desconecta el USB, manten el boton negro,
+reconecta, y lanza flash.bat otra vez. Repite hasta ver load_success!
+Reconectar reinicia la maquina de estados del bootloader a dfuIDLE.
+
+Hicieron falta 4 intentos en una ocasion. Es esperable, no indica averia.
+Cada intento suele llegar un paso mas lejos que el anterior.
+
+CUIDADO: una ejecucion cortada YA HIZO EL ERASE. Deja la flash borrada y sin
+aplicacion. Si lo dejas asi, la placa NO arranca. No pares hasta load_success!
+
+Si tras varios ciclos se corta siempre en el mismo punto:
+
+     paso2_solo_app.bat      <- escribe la aplicacion con dfu-programmer
+     flash.bat               <- y repite el procedimiento oficial
+
+
+DESPUES DE RECUPERAR
+--------------------
+Los slots quedan en CLOSED. Para dejarlos utilizables, por terminal serie
+(115200, comandos terminados en \r):
+
+     SETTINGMY=0     CONFIGMY=MF_CLASSIC_1K
+     SETTINGMY=1     CONFIGMY=MF_DETECTION
+
+Comprobar con VERSIONMY? -> debe responder "Chameleon-new-1.0".
+
+
+QUE NO HACER
+------------
+- No uses dfu-programmer por tu cuenta para "arreglarlo": sus escrituras dejan
+  la placa sin arrancar. Solo el paso2 documentado arriba.
+- No flashees ChameleonMini.eep como si fuera una aplicacion: su contenido va
+  en 0x8000, que es la zona del bootloader.
+- Desde Linux NO se puede flashear esta placa. Todas las escrituras fallan con
+  dfu_download / Broken pipe, con dfu-programmer y con avrdude. Documentado en
+  los issues #46, #93 y #62 del repo, ninguno resuelto.
+
+
+CONTENIDO
+---------
+flash.bat               procedimiento oficial (Createbin -> BOOT_LOADER_EXE)
+ChameleonMini.hex       firmware de fabrica   (era ITS_A_CARD.hex)
+ChameleonMini.eep       contenido de EEPROM   (era ChameleonMiniRDV2.0_ATxmega32A4U.hex)
+BOOT_LOADER_EXE.exe     flasheador del fabricante
+Createbin.exe           cifra el firmware (AES) como espera el bootloader
+avr-objcopy.exe         ihex -> binario
+msvcr120d.dll           runtime que necesita Createbin.exe
+dfu-programmer.exe      solo para el paso 2
+app_stock.hex           firmware de fabrica para el paso 2
+paso2_solo_app.bat      paso 2
+driver\                 driver DFU libusb-win32 (.inf + .sys)
+CHECKSUMS.md5           integridad
+
+
+OPCIONAL: flash_auto.bat  (reintento automatico)
+------------------------------------------------
+Hace lo mismo que flash.bat pero en bucle, hasta 6 intentos, comprobando
+load_success! en la salida. Entre intento e intento ejecuta:
+
+     dfu-programmer.exe atxmega32a4u launch
+
+que resetea el MCU (atmel_start_app_reset), no solo el estado DFU. Es el
+equivalente por software a desconectar y reconectar el cable.
+
+REQUISITO EN VIRTUALBOX: al resetearse, la placa se reenumera y VirtualBox la
+suelta. Para que el siguiente intento la vea, hay que crear un FILTRO USB fijo:
+  Configuracion de la VM > USB > anadir filtro con VendorID 03EB / ProductID 2FE4
+Sin ese filtro, el segundo intento fallara con "no device present" y habra que
+seguir haciendo el ciclo a mano.
+
+Si los 6 intentos fallan, el .bat avisa de que la flash quedo borrada y pide el
+ciclo fisico. flash.bat a mano sigue siendo la via de referencia.
+
+VERIFICADO EL 2026-09-11: flash_auto.bat funciona
+-------------------------------------------------
+Intento 1 se corto sin load_success -> el script ejecuto "launch" -> el MCU se
+reseteo -> intento 2 completo con load_success!
+
+Conclusion: "dfu-programmer launch" SI responde aunque el bootloader este en
+dfuERROR. El reset por software basta; no hace falta el ciclo fisico del cable.
+flash_auto.bat es por tanto la via recomendada, y flash.bat a mano el respaldo.
+
+NOTA AL LEER EL LOG: al redirigir la salida a fichero, BOOT_LOADER_EXE mezcla
+stdout (con buffer) y stderr (sin buffer). Por eso "load_success!" puede salir
+pegado a otra linea o en un sitio que no corresponde. Lo que importa es que
+APAREZCA, no donde. Si no aparece, el flasheo no se completo.

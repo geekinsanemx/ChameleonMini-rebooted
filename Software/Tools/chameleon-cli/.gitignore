@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+dump-*/
+backup-*/
+card-*.mfd
+clone-*.mfd
+detection-*.bin
