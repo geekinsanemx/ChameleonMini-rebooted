@@ -1,54 +1,54 @@
 # chameleon-cli
 
-Herramientas para ChameleonMini **RevE rebooted** (clon chino, ATxmega32A4U).
-Detectan automaticamente si el firmware usa comandos con sufijo `MY` (fabrica,
-`Chameleon-new-1.0`) o sin el (rebooted de iceman), asi que sirven con ambos.
+Tools for the ChameleonMini **RevE rebooted** (Chinese clone, ATxmega32A4U).
+They auto-detect whether the firmware uses the `MY` command suffix (factory,
+`Chameleon-new-1.0`) or not (iceman's rebooted), so they work with both.
 
-## Requisitos
+## Requirements
 
 ```
-pip install -r requirements.txt        # pyserial (+ pycryptodome para createbin)
+pip install -r requirements.txt        # pyserial (+ pycryptodome for createbin)
 ```
-Para funciones con lector fisico (ACR122U): `libnfc-bin`, `mfoc`, `mfcuk` y
-`mfkey32` (de proxmark3) en el host. El puerto se autodetecta (`/dev/ttyACM*`);
-usa `--port` para forzarlo. Si una VM tiene el USB capturado, sueltala.
+For the physical-reader features (ACR122U): `libnfc-bin`, `mfoc`, `mfcuk` and
+`mfkey32` (from proxmark3) on the host. The port is autodetected (`/dev/ttyACM*`);
+use `--port` to force it. If a VM has the USB captured, release it first.
 
-## chameleon.py - CLI por flags de accion
+## chameleon.py - action-flag CLI
 
-Se elige UNA accion (flag) y se acompana de modificadores.
+Pick ONE action (a flag) and add modifiers.
 
-### Acciones
+### Actions
 
-| Flag | Que hace | Requiere |
+| Flag | What it does | Requires |
 |---|---|---|
-| `--info` | version + resumen de los 8 slots | |
-| `--slots` | lista slots (config/uid/memsize) | |
-| `--dump` | vuelca slot(s) a fichero | `--slot N` \| `--all`, opc. `-o DIR` |
-| `--upload` | sube un volcado a un slot | `--file F --slot N`, opc. `--type CONF` |
-| `--backup` | respalda estado COMPLETO (config+uid+atqa+sak+datos) | `--slot N` \| `--all`, opc. `-o DIR` |
-| `--restore` | restaura desde un backup | `--dir D` (`--slot N` \| `--all`) |
-| `--create` | crea un tag desde cero | `--slot N`, opc. `--type --uid --atqa --sak --file` |
-| `--set-config CONF` | fija la config de un slot | `--slot N` |
-| `--set-uid HEX` | fija el UID | `--slot N` |
-| `--set-atqa HEX` | fija el ATQA | `--slot N` |
-| `--set-sak HEX` | fija el SAK | `--slot N` |
-| `--detection` | lee datos de deteccion y apunta a mfkey32 | `--slot N`, opc. `-o FILE` |
-| `--clone` | lee/crackea una tarjeta fisica (ACR122U) y la sube | `--slot N`, opc. `--type` |
-| `--read-card` | lee una tarjeta fisica (ACR122U) | opc. `-o FILE --keyfile K` |
-| `--crack` | recupera claves (mfoc, o mfcuk con `--darkside`) | opc. `-o FILE` |
-| `--reset` / `--dfu` | reinicia / entra en modo bootloader | |
+| `--info` | version + overview of the 8 slots | |
+| `--slots` | list slots (config/uid/memsize) | |
+| `--dump` | dump slot(s) to file | `--slot N` \| `--all`, opt. `-o DIR` |
+| `--upload` | upload a dump to a slot | `--file F --slot N`, opt. `--type CONF` |
+| `--backup` | back up FULL state (config+uid+atqa+sak+data) | `--slot N` \| `--all`, opt. `-o DIR` |
+| `--restore` | restore from a backup | `--dir D` (`--slot N` \| `--all`) |
+| `--create` | create a tag from scratch | `--slot N`, opt. `--type --uid --atqa --sak --file` |
+| `--set-config CONF` | set a slot's configuration | `--slot N` |
+| `--set-uid HEX` | set the UID | `--slot N` |
+| `--set-atqa HEX` | set the ATQA | `--slot N` |
+| `--set-sak HEX` | set the SAK | `--slot N` |
+| `--detection` | read detection data and point to mfkey32 | `--slot N`, opt. `-o FILE` |
+| `--clone` | read/crack a physical card (ACR122U) and upload | `--slot N`, opt. `--type` |
+| `--read-card` | read a physical card (ACR122U) | opt. `-o FILE --keyfile K` |
+| `--crack` | recover keys (mfoc, or mfcuk with `--darkside`) | opt. `-o FILE` |
+| `--reset` / `--dfu` | reset / enter bootloader mode | |
 
-### Modificadores
+### Modifiers
 
 `--slot N` `--all` `--file F` `-o/--out PATH` `--dir D` `--type CONF`
 `--uid HEX` `--atqa HEX` `--sak HEX` `--darkside` `--keyfile K` `-p/--port P`
 
-### Ejemplos
+### Examples
 
 ```
 python3 chameleon.py --info
-python3 chameleon.py --dump --all -o backup-hoy
-python3 chameleon.py --upload --file ~/Documents/tarjeta.bin --slot 4
+python3 chameleon.py --dump --all -o backup-today
+python3 chameleon.py --upload --file ~/card.bin --slot 4
 python3 chameleon.py --backup --all -o bk
 python3 chameleon.py --restore --all --dir bk
 python3 chameleon.py --restore --slot 2 --dir bk
@@ -57,25 +57,25 @@ python3 chameleon.py --set-uid AABBCCDD --slot 0
 python3 chameleon.py --clone --slot 6
 ```
 
-Un backup es un directorio con `manifest.json` + `slotN.bin`. `--restore` acepta
-`--all` (todos los slots del backup) o `--slot N` (solo uno).
+A backup is a directory with `manifest.json` + `slotN.bin`. `--restore` accepts
+`--all` (every slot in the backup) or `--slot N` (just one).
 
-## build_firmware.py - compila variantes y arma la flash-station
+## build_firmware.py - compile variants and build the flash-station
 
 ```
-python3 build_firmware.py                 # todas las variantes viables
+python3 build_firmware.py                 # all viable variants
 python3 build_firmware.py --only classic-detection
 ```
-Solo compila las que caben en 28672 B (limite de BOOT_LOADER_EXE.exe). Resultado
-en `Firmware/VM-Flash/flash-station/`.
+Only builds those that fit in 28672 B (the BOOT_LOADER_EXE.exe limit). Output in
+`Firmware/VM-Flash/flash-station/`.
 
-## chameleon_createbin.py - cifra firmware para el bootloader
+## chameleon_createbin.py - encrypt firmware for the bootloader
 
-Port a Python 3 del `crypt_operations.py createbin`. Lo usa build_firmware.
+Python 3 port of `crypt_operations.py createbin`. Used by build_firmware.
 
-## Notas
+## Notes
 
-El firmware rebooted **no tiene modo lector**: `read-card`, `crack` y `clone`
-usan el **ACR122U** del host, no la placa. El modo **deteccion** captura las
-claves que usa un LECTOR REAL contra la placa (no funciona con el ACR122U como
-atacante; necesita el lector objetivo).
+The rebooted firmware has **no reader mode**: `read-card`, `crack` and `clone`
+use the host **ACR122U**, not the board. **Detection** mode captures the keys a
+REAL reader uses against the board (it does not work with the ACR122U as the
+attacker; it needs the target reader).

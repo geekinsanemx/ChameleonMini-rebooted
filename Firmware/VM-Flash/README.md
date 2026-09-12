@@ -1,48 +1,48 @@
 # VM-Flash
 
-Flasheo del ChameleonMini **RevE rebooted** (clon, ATxmega32A4U) desde una VM
-Windows con USB passthrough. Desde Linux NO se puede flashear esta placa
-(dfu-programmer/avrdude dan Broken pipe; wine ejecuta el .exe pero no ve el USB;
-dosbox no aplica). La VM es imprescindible.
+Flashing the ChameleonMini **RevE rebooted** (clone, ATxmega32A4U) from a Windows
+VM with USB passthrough. This board cannot be flashed from Linux
+(dfu-programmer/avrdude give Broken pipe; wine runs the .exe but cannot see the
+USB; dosbox does not apply). The VM is required.
 
-## flash-station/ - estacion de flasheo (copiar una vez a la VM)
+## flash-station/ - flashing station (copy once to the VM)
 
-Contiene los binarios compartidos, las variantes compiladas en `fw/`, y un
-`flash_<variante>.bat` por cada una. Para flashear:
+Holds the shared binaries, the compiled variants under `fw/`, and one
+`flash_<variant>.bat` per variant. To flash:
 
-1. Entra en DFU: desconecta el USB, manten el boton negro, reconecta.
-   (o `python3 ../../Software/Tools/chameleon-cli/chameleon.py dfu` antes)
-2. Passthrough del `03eb:2fe4` a la VM.
-3. Ejecuta el .bat de la variante que quieras, p.ej.:
+1. Enter DFU: unplug the USB, hold the black button, replug.
+   (or `python3 ../../Software/Tools/chameleon-cli/chameleon.py --dfu` first)
+2. Passthrough 03eb:2fe4 to the VM.
+3. Run the .bat for the variant you want, e.g.:
    ```
    flash_classic-detection.bat
    ```
-4. Reintenta hasta ver `load_success!` (el bucle resetea el MCU solo entre
-   intentos). Desconecta y reconecta en modo normal.
+4. Retry until you see `load_success!` (the loop resets the MCU between attempts
+   on its own). Unplug and replug in normal mode.
 
-Variantes (todas caben en 28672 B):
+Variants (all fit in 28672 B):
 
-| .bat | contenido |
+| .bat | contents |
 |---|---|
-| flash_classic-detection      | Classic (Mini/1K/4K, UID 4/7B) + deteccion |
-| flash_classic-detection-brute| + fuerza bruta |
-| flash_classic-detection-log  | + registro |
-| flash_classic-only           | solo Classic (maximo margen) |
-| flash_classic-ntag           | Classic + NTAG 213/215/216 |
-| flash_ultralight-ntag        | Ultralight + NTAG 213/215/216 |
-| flash_factory                | firmware de FABRICA (Chameleon-new-1.0) |
+| flash_classic-detection       | Classic (Mini/1K/4K, UID 4/7B) + detection |
+| flash_classic-detection-brute | + brute force |
+| flash_classic-detection-log   | + logging |
+| flash_classic-only            | Classic only (max headroom) |
+| flash_classic-ntag            | Classic + NTAG 213/215/216 |
+| flash_ultralight-ntag         | Ultralight + NTAG 213/215/216 |
+| flash_factory                 | FACTORY firmware (Chameleon-new-1.0) |
 
-`load_success!` es la unica confirmacion real; el "Enjoy!" se imprime siempre.
+`load_success!` is the only real confirmation; the "Enjoy!" line is always printed.
 
-## rescue/ - salvavidas a fabrica (autonomo)
+## rescue/ - factory lifeboat (standalone)
 
-Copia independiente y probada para volver a fabrica si todo lo demas falla.
-Ver `rescue/LEEME.txt`. Mismo resultado que `flash-station/flash_factory.bat`,
-pero autocontenido por si prefieres una carpeta minima.
+Independent, tested copy to get back to factory if everything else fails.
+See `rescue/README.txt`. Same result as `flash-station/flash_factory.bat`, but
+self-contained in case you prefer a minimal folder.
 
-## Regenerar
+## Regenerate
 
-Las variantes se recompilan con:
+Recompile the variants with:
 ```
 python3 ../../Software/Tools/chameleon-cli/build_firmware.py
 ```

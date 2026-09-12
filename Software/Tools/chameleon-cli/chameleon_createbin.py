@@ -1,21 +1,20 @@
 #!/usr/bin/env python3
 """
-chameleon_createbin.py - Genera los .bin cifrados que espera BOOT_LOADER_EXE.exe
-del bootloader bloqueado de ChameleonMini RevE rebooted.
+chameleon_createbin.py - Produces the encrypted .bin files that BOOT_LOADER_EXE.exe
+expects for the locked bootloader of the ChameleonMini RevE rebooted.
 
-Equivalente a Createbin.exe (Windows) y a la operacion 'createbin' de
-Software/Tools/crypt_operations.py, que no funciona bajo Python 3.
+Equivalent to Createbin.exe (Windows) and to the 'createbin' operation in
+Software/Tools/crypt_operations.py, which does not run under Python 3.
 
-Formato: relleno a multiplo de 16 con ceros, 16 bytes 0xCD al final, y por cada
-bloque de 16 bytes un XOR incremental (0x2D + offset) seguido de descifrado AES.
+Format: pad to a multiple of 16 with zeros, append 16 bytes of 0xCD, and for
+each 16-byte block an incremental XOR (0x2D + offset) followed by an AES decrypt.
 
 CHANGELOG
-  1.0.0 - Version inicial, portada a Python 3 / pycryptodome.
+  1.0.0 - Initial version, ported to Python 3 / pycryptodome.
 """
 
 import argparse
 import subprocess
-import sys
 
 from Crypto.Cipher import AES
 
@@ -48,9 +47,9 @@ def ihex_to_bin(path):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Cifra firmware para el bootloader RevE rebooted")
-    parser.add_argument("input", help="fichero .hex (ihex) o .bin (binario plano)")
-    parser.add_argument("output", help="fichero .bin cifrado de salida")
+    parser = argparse.ArgumentParser(description="Encrypt firmware for the RevE rebooted bootloader")
+    parser.add_argument("input", help="an .hex (ihex) or .bin (raw binary) file")
+    parser.add_argument("output", help="encrypted .bin output file")
     parser.add_argument("-V", "--version", action="version", version=CURRENT_VERSION)
     args = parser.parse_args()
 

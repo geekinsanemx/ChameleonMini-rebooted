@@ -1,11 +1,11 @@
 @ECHO OFF
-REM Flashea la variante: classic-detection-brute
-REM Classic + deteccion + fuerza bruta de claves
+REM Flash variant: classic-detection-brute
+REM Classic + detection + key brute force
 CD /D "%~dp0"
 COPY /Y "fw\classic-detection-brute.hex" "ChameleonMini.hex" >NUL
 COPY /Y "fw\classic-detection-brute.eep" "ChameleonMini.eep" >NUL
 ECHO ============================================================
-ECHO  Variante: classic-detection-brute
-ECHO  Classic + deteccion + fuerza bruta de claves
+ECHO  Variant: classic-detection-brute
+ECHO  Classic + detection + key brute force
 ECHO ============================================================
 CALL _retry.bat
