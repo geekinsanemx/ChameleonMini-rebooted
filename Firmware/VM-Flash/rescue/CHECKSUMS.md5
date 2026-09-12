@@ -1,0 +1,12 @@
+6b9daf3344d14f8ba83b039ea5ab0e70  app_stock.hex
+6b9daf3344d14f8ba83b039ea5ab0e70  ChameleonMini.hex
+c7dedc0e655a4954ad17d832980fccf1  ChameleonMini.eep
+d927dee4ba5a9bfdd576ebd7bca204c8  avr-objcopy.exe
+9336f38067916d970b4811ed2d0ae7fd  BOOT_LOADER_EXE.exe
+4c3ec78c5bc604e16a15c13efdbdd5e2  Createbin.exe
+d2002444f1502d13b3785f606ef7c70d  dfu-programmer.exe
+f67ca8d338dfd99e3c540336221f8fa7  msvcr120d.dll
+77e2d4ed6db55f35d9d2e67ab7b8f596  flash.bat
+18db6151ad7d2ba5046c759ff2ba724b  flash_auto.bat
+862fba9cb992a787d968ddadca606691  flash_app_only.bat
+722ed85ecfd19ceafdcdc92ec27fb513  README.txt

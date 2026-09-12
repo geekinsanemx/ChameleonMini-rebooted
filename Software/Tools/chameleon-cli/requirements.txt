@@ -1,0 +1,2 @@
+pyserial>=3.5
+pycryptodome>=3.10   # only for chameleon_createbin.py (firmware encryption)
